@@ -8,6 +8,6 @@ mkdir ./build/classes
 #cp -r ./src/main/resources ./build/
 
 cpath=./build/classes:\
-./src/main/java/sira4j
+./src/main/java/
 
-javac -cp $cpath -d ./build/classes ./src/main/java/sira4j/Main.java
+javac -cp $cpath -d ./build/classes ./src/main/java/Main.java
