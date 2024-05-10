@@ -112,6 +112,7 @@ public class Sira{
             
 
             for(int x = x1; x < x2; ++x){
+
                 int curY = (dy*x-dy*x1 + dx*y1)/dx;
                 int nexY = (dy*(x+1)-dy*x1 + dx*y1)/dx;
 
@@ -145,4 +146,66 @@ public class Sira{
         }
 
     }
+
+
+    public static void fillCircle(int[] pixels, int WIDTH, int HEIGHT, int xC, int yC, int r, int color){
+        /*
+         * Pythagoras theorem
+         * a^2 + b^2 = c^2 where line 'a' and line 'b' meet at a right angle and c is the hypotenuse
+         *
+         * given a circle with known centre 'c' and radius 'r':
+         * to find out if a point 'p' is in or out of the circle
+         * we would need to find the square of the 
+         * distance of 'x' and 'y' from centre and see
+         * it is greater or less than the square of 'r'
+         *
+         * dx = |x - xC|
+         * dy = |y - yC|
+         *
+         * if dx^ + dy^2 <= r^2 -> then inside circle
+         *
+         */
+
+        int rSquared = r*r;
+
+        int y1 = yC - r;
+        int x1 = xC - r;
+
+        int y2 = yC + r;
+        int x2 = xC + r;
+        
+        for(int y = y1; y < y2; ++y){
+            for(int x = x1; x < x2; ++x){
+                int dy = y - yC;
+                if(dy < 0){
+                    dy*=-1;
+                }
+                int dx = x - xC;
+                if(dx < 0){
+                    dx*=-1;
+                }
+                if((dy*dy + dx*dx) <= rSquared){
+                    if(0 <= y && y < HEIGHT && 0 <= x && x < WIDTH){
+                        pixels[y*WIDTH + x] = color;
+                    }
+                }
+            }
+        }
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }
