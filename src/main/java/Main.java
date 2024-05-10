@@ -10,7 +10,7 @@ import javax.imageio.ImageIO;
 
 
 public class Main{
-    static final int SCALE  = 50;
+    static final int SCALE  = 10;
     static final int WIDTH  = 16*SCALE;
     static final int HEIGHT = 9*SCALE;
 
@@ -23,17 +23,29 @@ public class Main{
                     .getDataBuffer())).getData();
 
         int bg = 0xFF202020;
-        int fg = 0xFF0000FF;
+        int fgr = 0xFFFF0000;
+        int fgg = 0xFF00FF00;
+        int fgb = 0xFF0000FF;
 
         
         Arrays.fill(pixels, bg);
 
-        Sira.fillRect(pixels, WIDTH, HEIGHT, 100, 100, 100, 100, fg);
+       //Sira.fillRect(pixels, WIDTH, HEIGHT, 50, 50, 100, 100, fgr);
+       Sira.drawLine(pixels, WIDTH, HEIGHT, WIDTH/2, 0, WIDTH/2, HEIGHT, fgr);
+       Sira.drawLine(pixels, WIDTH, HEIGHT, 0, HEIGHT/2, WIDTH, HEIGHT/2, fgr);
+
+       Sira.drawLine(pixels, WIDTH, HEIGHT, 0, 0, WIDTH/4, HEIGHT, fgg);
+       Sira.drawLine(pixels, WIDTH, HEIGHT, 0, HEIGHT, WIDTH/4, 0, fgg);
+       
+       Sira.drawLine(pixels, WIDTH, HEIGHT, WIDTH*3/4, 0, WIDTH, HEIGHT, fgg);
+       Sira.drawLine(pixels, WIDTH, HEIGHT, WIDTH, HEIGHT, WIDTH*3/4, 0, fgg);
+
+       Sira.drawLine(pixels, WIDTH, HEIGHT, 0, 0, WIDTH, HEIGHT, fgb);
+       Sira.drawLine(pixels, WIDTH, HEIGHT, 0, HEIGHT, WIDTH, 0, fgb);
 
 
 
         try {
-            // retrieve image
             File outputfile = new File("saved.png");
             ImageIO.write(bi, "png", outputfile);
         } catch (IOException e) {
