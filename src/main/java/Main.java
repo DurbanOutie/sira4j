@@ -26,7 +26,7 @@ public class Main{
         Sira.fillRect(pixels, WIDTH, HEIGHT, 0, 0, WIDTH, HEIGHT, bg);
 
         //lineExample();
-        circleExample();
+        circleFillExample();
 
         
 
@@ -38,7 +38,7 @@ public class Main{
         }
 
     }
-    static void circleExample(){
+    static void circleFillExample(){
         Sira.fillCircle(pixels, WIDTH, HEIGHT, 0, 0, 500, fgr);
         Sira.fillCircle(pixels, WIDTH, HEIGHT, WIDTH/2, HEIGHT/2, 200, fgg);
         Sira.fillCircle(pixels, WIDTH, HEIGHT, WIDTH*3/4, HEIGHT*3/4, 100, fgb);
