@@ -194,12 +194,63 @@ public class Sira{
     }
 
 
+    public static void drawCircle(int[] pixels, int WIDTH, int HEIGHT, int xC, int yC, int r, int color){
+        /*
+         * Pythagoras theorem
+         * a^2 + b^2 = c^2 where line 'a' and line 'b' meet at a right angle and c is the hypotenuse
+         *
+         * given a circle with known centre 'c' and radius 'r':
+         * to find out if a point 'p' is in or out of the circle
+         * we would need to find the square of the 
+         * distance of 'x' and 'y' from centre and see
+         * it is greater or less than the square of 'r'
+         *
+         * dx = |x - xC|
+         * dy = |y - yC|
+         *
+         * if dx^ + dy^2 == r^2 -> then on the line circle
+         * This does not play well when working with
+         * integers and whole numbers.
+         *
+         * An error can be added in as a buffer to catch
+         * the values just outside the range.
+         *
+         * increasing the error inadvertently increases
+         * the thickness of the line and so it can be 
+         * parameterised.
+         *
+         * for now, using a value like r for the error
+         * seems to be providing adequet results.
+         *
+         */
 
+        int rSquared = r*r;
 
+        int y1 = yC - r;
+        int x1 = xC - r;
 
-
-
-
+        int y2 = yC + r + 1;
+        int x2 = xC + r + 1;
+        
+        for(int y = y1; y < y2; ++y){
+            for(int x = x1; x < x2; ++x){
+                int dy = y - yC;
+                if(dy < 0){
+                    dy*=-1;
+                }
+                int dx = x - xC;
+                if(dx < 0){
+                    dx*=-1;
+                }
+                int error = r;
+                if((dy*dy + dx*dx) <= rSquared + error && (dy*dy + dx*dx) >= rSquared - error ){
+                    if(0 <= y && y < HEIGHT && 0 <= x && x < WIDTH){
+                        pixels[y*WIDTH + x] = color;
+                    }
+                }
+            }
+        }
+    }
 
 
 
