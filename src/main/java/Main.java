@@ -27,7 +27,8 @@ public class Main{
 
         //lineExample();
         //circleFillExample();
-        circleDrawExample();
+        //circleDrawExample();
+        dotDrawExample();
         
 
         try {
@@ -37,6 +38,10 @@ public class Main{
             e.printStackTrace();
         }
 
+    }
+    
+    static void dotDrawExample(){
+        Sira.drawDot(pixels, WIDTH, HEIGHT, WIDTH/2, HEIGHT/2, fgr);
     }
 
     static void circleDrawExample(){
