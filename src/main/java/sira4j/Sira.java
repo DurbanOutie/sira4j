@@ -88,6 +88,9 @@ public class Sira{
             int t = x2;
             x2 = x1;
             x1 = t;
+            t = y2;
+            y2 = y1;
+            y1 = t;
         }
 
         //set up deltas, they can be either 0 or positive
@@ -256,6 +259,14 @@ public class Sira{
                 }
             }
         }
+    }
+
+    public static void drawTriangle(int[] pixels, int WIDTH, int HEIGHT, int x1, int y1, int x2, int y2, int x3, int y3, int color){
+
+        drawLine(pixels, WIDTH, HEIGHT, x2, y2, x1, y1, color);
+        drawLine(pixels, WIDTH, HEIGHT, x3, y3, x2, y2, color);
+        drawLine(pixels, WIDTH, HEIGHT, x1, y1, x3, y3, color);
+
     }
 
 
