@@ -46,13 +46,18 @@ package sira4j;
 
 public class Sira{
     
-    public static void drawDot(int[] pixels, int WIDTH, int HEIGHT, int x, int y, int color){
+    public static void drawDot(int[] pixels, int WIDTH, int HEIGHT, 
+            int x, int y, int color){
+        
         if(0 <= y && y < HEIGHT && 0 <= x && x < WIDTH){
             pixels[y*WIDTH + x] = color;
         }
+
     }
 
-    public static void fillRect(int[] pixels, int WIDTH, int HEIGHT, int x1, int y1, int w, int h, int color){
+    public static void fillRect(int[] pixels, int WIDTH, int HEIGHT, 
+            int x1, int y1, int w, int h, int color){
+        
         for(int y = y1; y < y1 + h; ++y){
             for(int x = x1; x < x1 + w; ++x){
                 if(0 <= y && y < HEIGHT && 0 <= x && x < WIDTH){
@@ -60,6 +65,7 @@ public class Sira{
                 }
             }
         }
+
     }
 
     /* Line between 2 points x1,y1 and x2,y2
@@ -80,7 +86,8 @@ public class Sira{
      *
      */
     
-    public static void drawLine(int[] pixels, int WIDTH, int HEIGHT, int x1, int y1, int x2, int y2, int color){
+    public static void drawLine(int[] pixels, int WIDTH, int HEIGHT, 
+            int x1, int y1, int x2, int y2, int color){
 
         //Swap points to avoid negative deltas, eaiser to work with
         
@@ -157,7 +164,8 @@ public class Sira{
     }
 
 
-    public static void fillCircle(int[] pixels, int WIDTH, int HEIGHT, int xC, int yC, int r, int color){
+    public static void fillCircle(int[] pixels, int WIDTH, int HEIGHT, 
+            int xC, int yC, int r, int color){
         /*
          * Pythagoras theorem
          * a^2 + b^2 = c^2 where line 'a' and line 'b' meet at a right angle and c is the hypotenuse
@@ -203,7 +211,8 @@ public class Sira{
     }
 
 
-    public static void drawCircle(int[] pixels, int WIDTH, int HEIGHT, int xC, int yC, int r, int color){
+    public static void drawCircle(int[] pixels, int WIDTH, int HEIGHT, 
+            int xC, int yC, int r, int color){
         /*
          * Pythagoras theorem
          * a^2 + b^2 = c^2 where line 'a' and line 'b' meet at a right angle and c is the hypotenuse
@@ -261,19 +270,153 @@ public class Sira{
         }
     }
 
-    public static void drawTriangle(int[] pixels, int WIDTH, int HEIGHT, int x1, int y1, int x2, int y2, int x3, int y3, int color){
+    public static void drawTriangle(int[] pixels, int WIDTH, int HEIGHT, 
+            int x1, int y1, int x2, int y2, int x3, int y3, int color){
 
         drawLine(pixels, WIDTH, HEIGHT, x2, y2, x1, y1, color);
         drawLine(pixels, WIDTH, HEIGHT, x3, y3, x2, y2, color);
         drawLine(pixels, WIDTH, HEIGHT, x1, y1, x3, y3, color);
 
     }
+    
+    public static void fillTriangle(int[] pixels, int WIDTH, int HEIGHT, 
+            int x1, int y1, int x2, int y2, int x3, int y3, int color){
+
+        //Simple bubble sort with 3 points
+        if(y1 > y2){
+            // swap 1 and 2
+            int t = y1;
+            y1 = y2;
+            y2 = t;
+
+            t = x1;
+            x1 = x2;
+            x2 = t;
+        }
+
+        if(y2 > y3){
+            // swap 1 and 2
+            int t = y2;
+            y2 = y3;
+            y3 = t;
+
+            t = x2;
+            x2 = x3;
+            x3 = t;
+        }
+
+        if(y1 > y2){
+            // swap 1 and 2 again
+            int t = y1;
+            y1 = y2;
+            y2 = t;
+
+            t = x1;
+            x1 = x2;
+            x2 = t;
+        }
+        // end simple bubble sort
+
+        /*
+         *
+         * for 2 lines starting at p2 and p3 intersecting at p1
+         * for any y position, there will be an x pos that is
+         * 
+         *    y = mx + c
+         *    mx = y - c
+         *    x = (y - c)/m
+         *    minX = x12 = (y - c12)/m12
+         *    maxX = x13 = (y - c13)/m13
+         *    if we iterater from minX through to maxX
+         *    That is equivalent of drawing a new line
+         *    between the 2 existing lines and ending on
+         *    the line
+         *
+         *
+         *
+         *                   p1
+         *                  *   *
+         *           m12   *     *        m13
+         *           c12  *        *      c13
+         *               *          *
+         *              p2            *
+         *                             *
+         *                              p3
+         *
+         * using this System of equations, solve for x for an given y between y1 and y2
+         *
+         * m12 = (y2 - y1)/(x2 - x1)
+         * c12 = y2 - m12*x2
+         *  
+         * minX = (y - c12)                                /             m12
+         * minX = (y - c12)                                /       ((y2 - y1)/(x2 - x1))
+         * minX = (y - y2 - ((y2 - y1)  /  (x2 - x1))*x2)  /       ((y2 - y1)/(x2 - x1))
+         * minX = (y - y2 - (y2*x2 - y1*x2) / (x2 - x1)))  /       ((y2 - y1)/(x2 - x1))
+         * .....
+         * final formula
+         * minX = (y - y2)*dx12/dy12 - 1
+         * maxX = (y - y2)*dx13/dy13 - 1
+         *
+         * but for some reason, received better results without
+         * the extra 1 at the end. so removed it.
+         *
+         * minX = (y - y2)*dx12/dy12
+         * maxX = (y - y2)*dx13/dy13
+         *
+         * to Iterate between p2 and p3 we swap the dx and dy (m)
+         * of p1 to p2 to that of p2 and p3 and iterate through
+         *
+         * minX = (y - y2)*dx23/dy23 
+         * maxX = (y - y3)*dx13/dy13
+         *
+         */
+
+        int dy12 = y2 - y1;
+        int dx12 = x2 - x1;
+        int dy13 = y3 - y1;
+        int dx13 = x3 - x1;
+        int dy23 = y2 - y3;
+        int dx23 = x2 - x3;
+
+        //first half from y1 to y2
+        for(int y = y1; y <= y2; ++y){
+
+            int minX = x2 + (dy12 !=0? (y - y2)*dx12/dy12 : 0);
+            int maxX = x3 + (dy13 !=0? (y - y3)*dx13/dy13 : 0);
+
+            if(minX > maxX){
+                int t = minX;
+                minX = maxX;
+                maxX = t;
+            }
 
 
+            for(int x = minX; x < maxX; ++x){
+                if(0 <= y && y < HEIGHT && 0 <= x && x < WIDTH){
+                    pixels[y*WIDTH + x] = color;
+                }
+            }
+        }
+        //Second half in reverse from y3 to y2
+        for(int y = y3; y > y2; --y){
 
+            int minX = x2 + (dy23 !=0? (y - y2)*dx23/dy23 : 0);
+            int maxX = x3 + (dy13 !=0? (y - y3)*dx13/dy13 : 0);
 
+            if(minX > maxX){
+                int t = minX;
+                minX = maxX;
+                maxX = t;
+            }
 
+            for(int x = minX; x < maxX; ++x){
+                if(0 <= y && y < HEIGHT && 0 <= x && x < WIDTH){
+                    pixels[y*WIDTH + x] = color;
+                }
+            }
+        }
 
+    }
 
 
 }
