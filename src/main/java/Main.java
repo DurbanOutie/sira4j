@@ -30,7 +30,8 @@ public class Main{
         //circleDrawExample();
         //dotDrawExample();
         //triangleDrawExample();
-        triangleFillExample();
+        //triangleFillExample();
+        fontExample();
         
 
         try {
@@ -40,6 +41,14 @@ public class Main{
             e.printStackTrace();
         }
 
+    }
+    static void fontExample(){
+        int x1 = WIDTH*2/8;
+        int y1 = HEIGHT*1/8;
+        Sira.drawFont(pixels, WIDTH, HEIGHT, 
+                x1, y1,"the quick brown fox jumps over the lazy dog", fgg);
+        Sira.drawFont(pixels, WIDTH, HEIGHT, 
+                x1, y1 + 40,"THE QUICK BROWN FOX JUMPS OVER THE LAZY DOG", fgg);
     }
     static void triangleFillExample(){
 
@@ -82,7 +91,9 @@ public class Main{
     }
     
     static void dotDrawExample(){
-        Sira.drawDot(pixels, WIDTH, HEIGHT, WIDTH/2, HEIGHT/2, fgr);
+        int x1 = WIDTH*2/4;
+        int y1 = HEIGHT/4;
+        Sira.drawDot(pixels, WIDTH, HEIGHT, x1, y1, fgr);
     }
 
     static void circleDrawExample(){
@@ -111,6 +122,14 @@ public class Main{
         Sira.drawLine(pixels, WIDTH, HEIGHT, 0, 0, WIDTH, HEIGHT, fgb);
         Sira.drawLine(pixels, WIDTH, HEIGHT, 0, HEIGHT, WIDTH, 0, fgb);
     }
+
+
+
+
+
+
+
+
 
 }
 

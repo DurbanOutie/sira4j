@@ -419,4 +419,40 @@ public class Sira{
     }
 
 
+    public static void drawFont(int[] pixels, int WIDTH, int HEIGHT, 
+           int x1, int y1, String s, int color){
+
+        int xStart = x1;
+        int yStart = y1;
+
+        char[] chars = s.toCharArray();
+        int[][][] charset = Font3x5.charset;
+
+        for(int i = 0; i < chars.length; ++i){
+
+            char c = chars[i];
+            xStart += 4;
+            if(xStart - x1 > 100){
+                xStart = x1;
+                yStart += 8;
+            }
+            if(charset[c] != null){
+                for(int row = 0; row < charset[c].length; ++row){
+                    for(int col = 0; col < charset[c][row].length; ++col){
+                        if(charset[c][row][col] == 1){
+                            int x = xStart + col;
+                            int y = yStart + row;
+                            if(0 <= y && y < HEIGHT && 0 <= x && x < WIDTH){
+                                pixels[y*WIDTH + x] = color;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+    }
+
+
+
 }
