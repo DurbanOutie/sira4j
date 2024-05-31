@@ -1,4 +1,6 @@
 package sira4j;
+
+import sira4j.font.*;
 /*
  * For nD array flattened to 1D -> to access an index use formula 
  * n*max(n - 1) + (n - 1)*max(n - 2) + .. + (n - (n - 1))*max(1).
@@ -419,31 +421,65 @@ public class Sira{
     }
 
 
-    public static void drawFont(int[] pixels, int WIDTH, int HEIGHT, 
+    public static void drawString(int[] pixels, int WIDTH, int HEIGHT, 
            int x1, int y1, String s, int color){
 
-        int xStart = x1;
-        int yStart = y1;
-
         char[] chars = s.toCharArray();
-        int[][][] charset = Font3x5.charset;
+        int[][][] charset = Font_DOT13_1.charset;
+
+
 
         for(int i = 0; i < chars.length; ++i){
 
             char c = chars[i];
-            xStart += 4;
-            if(xStart - x1 > 100){
-                xStart = x1;
-                yStart += 8;
+            if(c != '\t'){
+                if(charset[c] != null){
+                    for(int row = 0; row < charset[c].length; ++row){
+                        for(int col = 0; col < charset[c][row].length; ++col){
+                            if(charset[c][row][col] == 1){
+                                int x = x1 + col;
+                                int y = y1 + row;
+                                if(0 <= y && y < HEIGHT && 0 <= x && x < WIDTH){
+                                    pixels[y*WIDTH + x] = color;
+                                }
+                            }
+                        }
+                    }
+                }
+                if(c != '\n'){
+                    x1 = x1 + 6;
+                    if(x1 > WIDTH){
+                        x1 = 0;
+                        y1 = y1 + 8;
+                    }
+                }else{
+                    x1 = 0;
+                    y1 = y1 + 8;
+                }
             }
-            if(charset[c] != null){
-                for(int row = 0; row < charset[c].length; ++row){
-                    for(int col = 0; col < charset[c][row].length; ++col){
-                        if(charset[c][row][col] == 1){
-                            int x = xStart + col;
-                            int y = yStart + row;
-                            if(0 <= y && y < HEIGHT && 0 <= x && x < WIDTH){
-                                pixels[y*WIDTH + x] = color;
+
+        }
+
+    }
+    
+    public static void drawChar(int[] pixels, int WIDTH, int HEIGHT, 
+           int x1, int y1, int scale, char c, int color){
+
+        int[][][] charset = Font_DOT13_1.charset;
+
+        if(charset[c] != null){
+            for(int row = 0; row < charset[c].length; ++row){
+                for(int col = 0; col < charset[c][row].length; ++col){
+                    if(charset[c][row][col] == 1){
+                        int rowSub = row*scale;
+                        int colSub = col*scale;
+                        for(int ySub = 0; ySub < scale; ++ySub){
+                            for(int xSub = 0; xSub < scale; ++xSub){
+                                int x = x1 + colSub + xSub;
+                                int y = y1 + rowSub + ySub;
+                                if(0 <= y && y < HEIGHT && 0 <= x && x < WIDTH){
+                                    pixels[y*WIDTH + x] = color;
+                                }
                             }
                         }
                     }
