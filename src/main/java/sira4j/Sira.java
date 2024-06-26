@@ -47,28 +47,84 @@ import sira4j.font.*;
 
 
 public class Sira{
+
+
+    public static final String version = "0.0.1-e";
+
+    private static void blastPixel(int[] pixels, int pos, int color){
+        pixels[pos] = color;
+    }
     
-    public static void drawDot(int[] pixels, int WIDTH, int HEIGHT, 
+    private static void blendPixel(int[] pixels, int pos, int color){
+
+        int currentColor = pixels[pos];
+        
+        byte ca = (byte)((currentColor >> 24) & 0xFF);
+        byte cr = (byte)((currentColor >> 16) & 0xFF);
+        byte cg = (byte)((currentColor >>  8) & 0xFF);
+        byte cb = (byte)((currentColor >>  0) & 0xFF);
+
+        
+        byte a = (byte)((color >> 24) & 0xFF);
+        byte r = (byte)((color >> 16) & 0xFF);
+        byte g = (byte)((color >>  8) & 0xFF);
+        byte b = (byte)((color >>  0) & 0xFF);
+
+        byte na = (byte)((ca + a));
+        byte nr = (byte)((cr + r));
+        byte ng = (byte)((cg + g));
+        byte nb = (byte)((cb + b));
+
+        color = (na << 24) | 
+                (nr << 16) |
+                (ng <<  8) |
+                (nb <<  0);
+
+
+            pixels[pos] = color;
+    }
+    
+    public static void drawDot(int[] pixels, int wMax, int hMax, 
             int x, int y, int color){
         
-        if(0 <= y && y < HEIGHT && 0 <= x && x < WIDTH){
-            pixels[y*WIDTH + x] = color;
+        if(0 <= y && y < hMax && 0 <= x && x < wMax){
+            pixels[y*wMax + x] = color;
         }
 
     }
+    
+    public static void fillRect(Canvas c,
+            int x1, int y1, int w, int h, int color){
+        fillRect(c.pixels, c.w, c.h, x1, y1, w, h, color);
 
-    public static void fillRect(int[] pixels, int WIDTH, int HEIGHT, 
+    }
+
+    public static void fillRect(int[] pixels, int wMax, int hMax, 
             int x1, int y1, int w, int h, int color){
         
         for(int y = y1; y < y1 + h; ++y){
             for(int x = x1; x < x1 + w; ++x){
-                if(0 <= y && y < HEIGHT && 0 <= x && x < WIDTH){
-                    pixels[y*WIDTH + x] = color;
+                if(0 <= y && y < hMax && 0 <= x && x < wMax){
+                    pixels[y*wMax + x] = color;
                 }
             }
         }
-
     }
+
+    public static void drawRect(Canvas c, 
+            int x1, int y1, int w, int h, int color){
+        drawRect(c.pixels, c.w, c.h, x1, y1, w, h, color);
+    }
+
+    public static void drawRect(int[] pixels, int wMax, int hMax, 
+            int x1, int y1, int w, int h, int color){
+        drawLine(pixels, wMax, hMax, x1, y1, x1 + w, y1, color);
+        drawLine(pixels, wMax, hMax, x1, y1, x1, y1 + h, color);
+        drawLine(pixels, wMax, hMax, x1 + w, y1 + h, x1 + w, y1, color);
+        drawLine(pixels, wMax, hMax, x1 + w, y1 + h, x1, y1 + h, color);
+        
+    }
+    
 
     /* Line between 2 points x1,y1 and x2,y2
      * 
@@ -87,8 +143,12 @@ public class Sira{
      * y = (dy*x-dy*x1 + dx*y1)/dx
      *
      */
+    public static void drawLine(Canvas c, 
+            int x1, int y1, int x2, int y2, int color){
+        drawLine(c.pixels, c.w, c.h, x2, y2, x1, y1, color);
+    }
     
-    public static void drawLine(int[] pixels, int WIDTH, int HEIGHT, 
+    public static void drawLine(int[] pixels, int wMax, int hMax, 
             int x1, int y1, int x2, int y2, int color){
 
         //Swap points to avoid negative deltas, eaiser to work with
@@ -141,8 +201,8 @@ public class Sira{
                 }
 
                 for(int y = curY; y <= nexY; ++y){
-                    if(0 <= y && y < HEIGHT && 0 <= x && x < WIDTH){
-                        pixels[y*WIDTH + x] = color;
+                    if(0 <= y && y < hMax && 0 <= x && x < wMax){
+                        pixels[y*wMax + x] = color;
                     }
                 }
             }
@@ -156,17 +216,22 @@ public class Sira{
             
             int x = x1;
             for(int y = y1; y < y2; ++y){
-                if(0 <= y && y < HEIGHT && 0 <= x && x < WIDTH){
-                    pixels[y*WIDTH + x] = color;
+                if(0 <= y && y < hMax && 0 <= x && x < wMax){
+                    pixels[y*wMax + x] = color;
                 }
             }
             
         }
 
     }
+    
+    public static void fillCircle(Canvas c, 
+            int xC, int yC, int r, int color){
+        fillCircle(c.pixels, c.w, c.h, xC, yC, r, color);
+    }
 
 
-    public static void fillCircle(int[] pixels, int WIDTH, int HEIGHT, 
+    public static void fillCircle(int[] pixels, int wMax, int hMax, 
             int xC, int yC, int r, int color){
         /*
          * Pythagoras theorem
@@ -204,8 +269,8 @@ public class Sira{
                     dx*=-1;
                 }
                 if((dy*dy + dx*dx) <= rSquared){
-                    if(0 <= y && y < HEIGHT && 0 <= x && x < WIDTH){
-                        pixels[y*WIDTH + x] = color;
+                    if(0 <= y && y < hMax && 0 <= x && x < wMax){
+                        pixels[y*wMax + x] = color;
                     }
                 }
             }
@@ -213,7 +278,7 @@ public class Sira{
     }
 
 
-    public static void drawCircle(int[] pixels, int WIDTH, int HEIGHT, 
+    public static void drawCircle(int[] pixels, int wMax, int hMax, 
             int xC, int yC, int r, int color){
         /*
          * Pythagoras theorem
@@ -264,24 +329,30 @@ public class Sira{
                 }
                 int error = r;
                 if((dy*dy + dx*dx) <= rSquared + error && (dy*dy + dx*dx) >= rSquared - error ){
-                    if(0 <= y && y < HEIGHT && 0 <= x && x < WIDTH){
-                        pixels[y*WIDTH + x] = color;
+                    if(0 <= y && y < hMax && 0 <= x && x < wMax){
+                        pixels[y*wMax + x] = color;
                     }
                 }
             }
         }
     }
 
-    public static void drawTriangle(int[] pixels, int WIDTH, int HEIGHT, 
+    public static void drawTriangle(int[] pixels, int wMax, int hMax, 
             int x1, int y1, int x2, int y2, int x3, int y3, int color){
 
-        drawLine(pixels, WIDTH, HEIGHT, x2, y2, x1, y1, color);
-        drawLine(pixels, WIDTH, HEIGHT, x3, y3, x2, y2, color);
-        drawLine(pixels, WIDTH, HEIGHT, x1, y1, x3, y3, color);
+        drawLine(pixels, wMax, hMax, x2, y2, x1, y1, color);
+        drawLine(pixels, wMax, hMax, x3, y3, x2, y2, color);
+        drawLine(pixels, wMax, hMax, x1, y1, x3, y3, color);
+
+    }
+    public static void fillTriangle(Canvas c, 
+            int x1, int y1, int x2, int y2, int x3, int y3, int color){
+
+        fillTriangle(c.pixels, c.w, c.h, x1, y1, x2, y2, x3, y3, color);
 
     }
     
-    public static void fillTriangle(int[] pixels, int WIDTH, int HEIGHT, 
+    public static void fillTriangle(int[] pixels, int wMax, int hMax, 
             int x1, int y1, int x2, int y2, int x3, int y3, int color){
 
         //Simple bubble sort with 3 points
@@ -394,8 +465,8 @@ public class Sira{
 
 
             for(int x = minX; x < maxX; ++x){
-                if(0 <= y && y < HEIGHT && 0 <= x && x < WIDTH){
-                    pixels[y*WIDTH + x] = color;
+                if(0 <= y && y < hMax && 0 <= x && x < wMax){
+                    pixels[y*wMax + x] = color;
                 }
             }
         }
@@ -412,20 +483,40 @@ public class Sira{
             }
 
             for(int x = minX; x < maxX; ++x){
-                if(0 <= y && y < HEIGHT && 0 <= x && x < WIDTH){
-                    pixels[y*WIDTH + x] = color;
+                if(0 <= y && y < hMax && 0 <= x && x < wMax){
+                    pixels[y*wMax + x] = color;
                 }
             }
         }
 
     }
+    
+    public static void drawString(Canvas c,
+           int x1, int y1, String s, int scale, int color, boolean blend){
+        drawString(c.pixels, c.w, c.h, x1, y1, s, scale, color, blend);
+    }
+    public static void drawString(Canvas c,
+           int x1, int y1, String s, int scale, int color){
+        drawString(c.pixels, c.w, c.h, x1, y1, s, scale, color, false);
+    }
 
-
-    public static void drawString(int[] pixels, int WIDTH, int HEIGHT, 
+    public static void drawString(Canvas c,
            int x1, int y1, String s, int color){
+        drawString(c.pixels, c.w, c.h, x1, y1, s, 1, color, false);
+    }
+    public static void drawString(int[] pixels, int wMax, int hMax, 
+           int x1, int y1, String s, int color){
+        drawString(pixels, wMax, hMax, x1, y1, s, 1, color, false);
+    }
+
+    public static void drawString(int[] pixels, int wMax, int hMax, 
+           int x1, int y1, String s, int scale, int color, boolean blend){
 
         char[] chars = s.toCharArray();
         int[][][] charset = Font_DOT13_1.charset;
+
+        int xNext = x1;
+        int yNext = y1;
 
 
 
@@ -436,33 +527,42 @@ public class Sira{
                 if(charset[c] != null){
                     for(int row = 0; row < charset[c].length; ++row){
                         for(int col = 0; col < charset[c][row].length; ++col){
-                            if(charset[c][row][col] == 1){
-                                int x = x1 + col;
-                                int y = y1 + row;
-                                if(0 <= y && y < HEIGHT && 0 <= x && x < WIDTH){
-                                    pixels[y*WIDTH + x] = color;
+                            int rowSub = row*scale;
+                            int colSub = col*scale;
+                            for(int ySub = 0; ySub < scale; ++ySub){
+                                for(int xSub = 0; xSub < scale; ++xSub){
+                                    int x = xNext + colSub + xSub;
+                                    int y = yNext + rowSub + ySub;
+                                    if(charset[c][row][col] == 1){
+                                        if(0 <= y && y < hMax && 0 <= x && x < wMax){
+                                            if(blend)
+                                                blendPixel(pixels, y*wMax + x, color);
+                                            else
+                                                blastPixel(pixels, y*wMax + x, color);
+
+                                        }
+                                    }
                                 }
                             }
                         }
                     }
                 }
                 if(c != '\n'){
-                    x1 = x1 + 6;
-                    if(x1 > WIDTH){
-                        x1 = 0;
-                        y1 = y1 + 8;
+                    xNext = xNext + 6*scale; // NOTE(Dot): Fix Magic numbers, W and H of char raster
+                    if(x1 > wMax){
+                        xNext = x1;
+                        yNext = y1 + 8*scale;
                     }
                 }else{
-                    x1 = 0;
-                    y1 = y1 + 8;
+                    xNext = x1;
+                    yNext = y1 + 8*scale;
                 }
             }
-
         }
 
     }
     
-    public static void drawChar(int[] pixels, int WIDTH, int HEIGHT, 
+    public static void drawChar(int[] pixels, int wMax, int hMax, 
            int x1, int y1, int scale, char c, int color){
 
         int[][][] charset = Font_DOT13_1.charset;
@@ -477,8 +577,8 @@ public class Sira{
                             for(int xSub = 0; xSub < scale; ++xSub){
                                 int x = x1 + colSub + xSub;
                                 int y = y1 + rowSub + ySub;
-                                if(0 <= y && y < HEIGHT && 0 <= x && x < WIDTH){
-                                    pixels[y*WIDTH + x] = color;
+                                if(0 <= y && y < hMax && 0 <= x && x < wMax){
+                                    pixels[y*wMax + x] = color;
                                 }
                             }
                         }
@@ -489,6 +589,7 @@ public class Sira{
 
     }
 
-
-
 }
+
+
+
